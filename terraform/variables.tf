@@ -62,7 +62,7 @@ variable "container" {
   })
   default = {
     name  = "diag-app"
-    image = "goat/diag"
+    image = "cribl-registry/latest"
     ports = [8000]
   }
   description = "Container configuration to deploy"
