@@ -21,19 +21,30 @@ resource "aws_ecs_task_definition" "task" {
   network_mode       = "awsvpc"
   cpu                = 256
   memory             = 512
-  container_definitions = jsonencode([
-    {
-      name      = var.container.name
-      image     = var.container.image
-      essential = true
-      portMappings = [
-        {
-          containerPort = 8000
-          hostPort      = 8000
+  container_definitions = <<DEFINITION
+    [
+      {
+        "name": "${var.container.name}",
+        "image": "${var.container.image}",
+        "essential": true,
+        "portMappings": [
+          {
+            "containerPort": 8000,
+            "hostPort": 8000
+          }
+        ],
+        "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "diag-app-logs",
+            "awslogs-region": "us-west-2",
+            "awslogs-stream-prefix": "diag-app-logs",
+            "awslogs-create-group": "true"
+          }
         }
-      ]
-    }
-  ])
+      }
+    ]
+    DEFINITION
 }
 
 ### ECS service

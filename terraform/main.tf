@@ -96,7 +96,7 @@ resource "aws_security_group" "alb" {
 resource "aws_security_group_rule" "https_from_anywhere" {
   type              = "ingress"
   from_port         = 80
-  to_port           = 8000
+  to_port           = 80
   protocol          = "TCP"
   cidr_blocks       = var.allow_cidr_block
   security_group_id = aws_security_group.alb.id
