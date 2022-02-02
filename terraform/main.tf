@@ -49,38 +49,32 @@ resource "aws_lb_listener" "front_end_alb_80_redirect_to_443" {
   load_balancer_arn = aws_lb.alb.arn
   port              = "80"
   protocol          = "HTTP"
+  default_action {
+    type = "redirect"
 
-   default_action {
-    type             = "forward"
-     target_group_arn = aws_lb_target_group.alb-diag-tg.arn
-     }
-#uncomment when redirect to 443 is required
-#  default_action {
-#    type = "redirect"
-
-#    redirect {
-#      port        = "443"
-#      protocol    = "HTTPS"
-#      status_code = "HTTP_301"
-#    }
-#  }
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
 }
 
-# If SSL termination at ALB - issue certificate
-#resource "aws_lb_listener" "front_end" {
-#  load_balancer_arn = aws_lb.alb.arn
-#  port              = "443"
-#  protocol          = "HTTPS"
-#  ssl_policy        = "ELBSecurityPolicy-2016-08"
-#  certificate_arn   = "arn:aws:iam::............................"
+# SSL termination at ALB - self signed  certificate
+resource "aws_lb_listener" "front_end" {
+  load_balancer_arn = aws_lb.alb.arn
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = "arn:aws:iam::880677349237:server-certificate/DIAG"
 
-#  default_action {
-#    type             = "forward"
-#    target_group_arn = aws_lb_target_group.alb-diag-tg.arn
-#  }
-#}
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.alb-diag-tg.arn
+  }
+}
 
-###Add authentication??
+###Add authentication - depends on HTTPS enabled
 
 ### ALB security group
 resource "aws_security_group" "alb" {

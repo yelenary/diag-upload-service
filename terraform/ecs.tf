@@ -52,7 +52,7 @@ resource "aws_ecs_service" "service" {
   name            = var.ecs.service_name
   cluster         = aws_ecs_cluster.cluster.id
   task_definition = aws_ecs_task_definition.task.arn
-  desired_count   = 1
+  desired_count   = 2
 
   network_configuration {
     subnets          = [for s in data.aws_subnet.subnets : s.id]

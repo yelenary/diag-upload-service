@@ -12,12 +12,17 @@ app.post('/upload', (req, res) => {
         return res.status(400).send('No files uploaded.');
     }
     let diag = req.files.diag;
+    if (!diag.name.indexOf(".tgz") || (diag.name.length - diag.name.indexOf(".tgz")-1)!=3 ){
+        console.log(`Not compatible diag file format provided: ${diag.name}`)
+        return res.status(400).send('Not compatible diag file format provided. *.tgz file required.');
+      }
     diag.mv(`${diagDir}/${diag.name}`, function (err) {
         if (err) {
             return res.status(500).send(err);
         }
     });
     res.send(`File ${diag.name} uploaded`);
+    console.log(`File uploaded: ${diag.name}`)
 })
 
 app.get('/download/:id', (req, res) => {
