@@ -13,11 +13,6 @@ resource "aws_lb" "alb" {
   internal           = var.alb.internal      # false
   load_balancer_type = "application"
   subnets            = [for s in data.aws_subnet.subnets : s.id]
-#  access_logs {
-#    bucket = "diag-alb-logs"
-#    prefix  = "diag-lb"
-#    enabled = true
-#  }
 
   tags = {
     Environment = var.environment
@@ -60,7 +55,7 @@ resource "aws_lb_listener" "front_end_alb_80_redirect_to_443" {
   }
 }
 
-# SSL termination at ALB - self signed  certificate
+### SSL termination at ALB - self signed  certificate
 resource "aws_lb_listener" "front_end" {
   load_balancer_arn = aws_lb.alb.arn
   port              = "443"
@@ -86,15 +81,20 @@ resource "aws_security_group" "alb" {
   }
 }
 
-### HTTP ingress
+
+### HTTP/S ingress
 resource "aws_security_group_rule" "https_from_anywhere" {
+  count = length(var.ingress_rules)
+
   type              = "ingress"
-  from_port         = 80
-  to_port           = 80
-  protocol          = "TCP"
-  cidr_blocks       = var.allow_cidr_block
+  from_port         = var.ingress_rules[count.index].from_port
+  to_port           = var.ingress_rules[count.index].to_port
+  protocol          = var.ingress_rules[count.index].protocol
+  cidr_blocks       = [var.ingress_rules[count.index].cidr_block]
+  description       = var.ingress_rules[count.index].description
   security_group_id = aws_security_group.alb.id
 }
+
 
 ### Outbound open everywhere
 resource "aws_security_group_rule" "outbound_internet_access" {

@@ -17,10 +17,6 @@ variable "health_check_path" {
   description = "The default health check path"
 }
 
-variable "allow_cidr_block" {
-  default     = ["0.0.0.0/0"]
-  description = "Specify cidr block that is allowed to access the LoadBalancer"
-}
 
 variable "environment" {
   default = "diag-environment"
@@ -66,4 +62,30 @@ variable "container" {
     ports = [8000]
   }
   description = "Container configuration to deploy"
+}
+
+variable "ingress_rules" {
+    type = list(object({
+      from_port   = number
+      to_port     = number
+      protocol    = string
+      cidr_block  = string
+      description = string
+    }))
+    default     = [
+        {
+          from_port   = 80
+          to_port     = 80
+          protocol    = "tcp"
+          cidr_block  = "0.0.0.0/0"
+          description = "allow HTTP (redirect to https)"
+        },
+        {
+          from_port   = 443
+          to_port     = 443
+          protocol    = "tcp"
+          cidr_block  = "0.0.0.0/0"
+          description = "allow HTTPS"
+        },
+    ]
 }
